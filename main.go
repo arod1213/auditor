@@ -2,14 +2,12 @@ package main
 
 import (
 	"ascap/commands"
-	"ascap/database"
+	"ascap/setup"
 	"errors"
 	"flag"
 	"fmt"
 	"os"
 	"strings"
-
-	"github.com/joho/godotenv"
 )
 
 type CommandType int
@@ -34,20 +32,20 @@ func parseCommand(arg string) (CommandType, error) {
 }
 
 func main() {
-	name := flag.String("name", "", "name")
-	flag.Parse()
-	fmt.Println("name is ", *name)
-
-	if err := godotenv.Load(); err != nil {
-		fmt.Print("env could not be loaded")
+	err := setup.LoadEnv()
+	if err != nil {
 		return
 	}
 
-	db, err := database.EstablishConnection()
+	db, err := setup.EstablishConnection()
 	if err != nil {
 		fmt.Println("error establishing connection:", err)
 		os.Exit(1)
 	}
+
+	name := flag.String("name", "", "name")
+	flag.Parse()
+	fmt.Println("name is ", *name)
 
 	args := os.Args
 	if len(args) < 2 {
